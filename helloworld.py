@@ -1,5 +1,5 @@
 def main():
-    print("Maja")
+    print("pocinjemo koristit git")
 
 
 if __name__ == '__main__':
