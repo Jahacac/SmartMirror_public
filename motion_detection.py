@@ -30,8 +30,6 @@ def detect_motion():
     detected = 0
     crop_rectangle = (50, 50, 100, 100)
 
-
-    # loop over the frames from the video stream
     while True:
 
         prev = vs.read()
@@ -39,9 +37,6 @@ def detect_motion():
         prev = prev[50:100, 50:100]
         prevgray = cv2.cvtColor(prev, cv2.COLOR_BGR2GRAY)
 
-        # grab the frame from the threaded video stream, resize it to
-        # have a maximum width of 400 pixels, and convert it to
-        # grayscale
         frame = vs.read()
         frame = imutils.resize(frame, width=600)
 
@@ -67,18 +62,13 @@ def detect_motion():
         text = "movements: {}".format(detected)
         cv2.putText(frame, text, (10, 20), cv2.FONT_HERSHEY_SIMPLEX,
             0.5, (0, 0, 255), 1)
-        # check to see if a face was detected, and if so, draw the total
-        # number of faces on the frame
 
-        # show the frame
         cv2.imshow("Frame", frame)
         key = cv2.waitKey(1) & 0xFF
 
-        # if the `q` key was pressed, break from the loop
         if key == ord("q"):
             break
 
-    # do a bit of cleanup
     cv2.destroyAllWindows()
     vs.stop()
 
