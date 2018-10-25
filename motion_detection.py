@@ -8,17 +8,6 @@ import cv2
 import numpy as np
 import image
 
-def mse(imageA, imageB):
-	# the 'Mean Squared Error' between the two images is the
-	# sum of the squared difference between the two images;
-	# NOTE: the two images must have the same dimension
-	err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
-	err /= float(imageA.shape[0] * imageA.shape[1])
-
-	# return the MSE, the lower the error, the more "similar"
-	# the two images are
-	return err
-
 def detect_motion():
 
     print("[INFO] camera sensor warming up...")
@@ -57,7 +46,7 @@ def detect_motion():
         err = np.sum((prevgray.astype("float") - gray.astype("float")) ** 2)
         err /= float(prevgray.shape[0] * gray.shape[1])
 
-        if err > 300:
+        if err > 100:
             detected += 1
         text = "movements: {}".format(detected)
         cv2.putText(frame, text, (10, 20), cv2.FONT_HERSHEY_SIMPLEX,
