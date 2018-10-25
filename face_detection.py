@@ -7,7 +7,7 @@ import dlib
 import cv2
 
 
-def detect():
+def detect_face():
 
     # construct the argument parser and parse the arguments
     ap = argparse.ArgumentParser()
@@ -44,7 +44,7 @@ def detect():
         # check to see if a face was detected, and if so, draw the total
         # number of faces on the frame
         if len(rects) > 0:
-            text = "{} sexy bitches found".format(len(rects))
+            text = "{} people found".format(len(rects))
             cv2.putText(frame, text, (10, 20), cv2.FONT_HERSHEY_SIMPLEX,
                 0.5, (0, 0, 255), 1)
 
@@ -83,4 +83,4 @@ def detect():
 
 
 if __name__ == '__main__':
-    detect()
+    detect_face()
