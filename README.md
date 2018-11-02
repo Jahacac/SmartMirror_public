@@ -1,4 +1,26 @@
-***********face_detection, prikaze se kamera i koliko lica je prepoznao itd.
+POKRETANJE NA WINDOSIMA
+-----------------------
+1. U Pycharmu otići na File->Settings->Project:SmartMirror->Project Interpreter
+u Project Interpreter bi moralo pisati Python 3.6(SmartMirror) C:\Users\Korisnik\Anaconda3\envs\SmartMirror\python.exe
+ako ne piše na ikonicu settings pa Conda Enviroment i napraviti novi.
+2.Kad to završiš vratit se na Project Interpreter i kliknuti zeleni kružić Conde. To znači da će Pycharm koristiti pakete koje smo instalirali preko Conde
+3. [Provjera] Otvoriti Anaconda navigator i sa strane kliknut na Enviroments i Smart Mirror bi trebao biti tamo ako nije jebiga
+4. Sad treba ući u Anaconda promt i upisati activate SmartMirror (sad smo u njegovom env)
+5. Otići u folder od SmartMirrora
+6. napisati naredbu koja će instalirati sve iz env.txt (ima u conda cheate shitu)
+7.that's it
+-------------------------------
+Kodovi se mogu pokretati ili iz pycharama ili ako trebaju argumente kao ivanin onda u conda promtu
+npr.
+activate SmartMirror
+cd cd do SmartMirror
+python hello.py
+
+
+
+POKRETANJE NA LINUXU
+-----------------------
+face_detection, prikaze se kamera i koliko lica je prepoznao itd.
 
 pokrece se tako da u terminalu udes u directory u kojem se ovo sve nalazi,
 utipkaj:
