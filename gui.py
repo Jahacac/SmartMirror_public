@@ -23,3 +23,20 @@ root.bind("<Escape>", lambda event:root.destroy())
 root.after(10000, root.destroy)
 
 root.mainloop()
+
+"""
+Ako se pise ovako kod^ nemoze se poslje importat u mainu i izvrsit kao zasebna dretva jer kad radis import se sve izvrsi i u ovom slucaju, otic ce u mainloop i sve sjebat.
+
+Ovako treba gui pisat(u main.py):
+
+def main():
+    blabla sranja s ostalim dretvama
+    blablabla gui kod
+
+if __name__ == '__main__':
+    main()
+    
+GUI ce bit glavna (prva) dretva jer ako se stavi u neku drugu Tkinter zna zafrkavat i bacat errore. 
+Sve ostalo ce bit u drugim dretvama, pokrenite main.py i proucite.
+
+"""
