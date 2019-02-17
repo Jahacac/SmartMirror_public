@@ -46,7 +46,7 @@ def detect_motion():
         err = np.sum((prevgray.astype("float") - gray.astype("float")) ** 2)
         err /= float(prevgray.shape[0] * gray.shape[1])
 
-        if err > 100:
+        if err > 300:
             detected += 1
         text = "movements: {}".format(detected)
         cv2.putText(frame, text, (10, 20), cv2.FONT_HERSHEY_SIMPLEX,
