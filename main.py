@@ -10,6 +10,8 @@ import time
 import dlib
 import cv2
 
+from tkinter import *
+import time
 
 from face_detection import FaceDetection
 
@@ -35,8 +37,6 @@ class Printer(Thread): #sluzi kao demo da vidimo sta se dogada u pozadini (s pri
         with self.lock:
             self._value = has_face
 
-
-
 def main(): #
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--shape-predictor", required=True, #ili p ili shape predictor se koriste u commandlineu, true jer je obavezno
@@ -49,11 +49,24 @@ def main(): #
     face = FaceDetection(args.shape_predictor, face_callbacks=[p.face_update])
     face.start()
 
+    def tick():
+        time_string = time.strftime("%H:%M:%S")
+        clock.config(text=time_string)
+        clock.after(200, tick)
 
+    root = Tk()
+    clock = Label(root, font=("times", 50, "bold"), bg= "black", fg = "white")
+    clock.grid(row=0, column=0)
+    tick()
 
-    p.join() #mozda ne treba, ali bez ovoga glavna dretva zavrsi i umre, a ostale pokrenute (Printer i facedetection) nastave radit.
-            #neke dretve (Daemon - pozadinski proces koj kad mu glavna dretva umre umre i on)
-    face.join()
+    root.configure(background='black')
+    #root.attributes('-fullscreen',True)
+
+    root.wm_attributes("-topmost", 1)
+    root.focus_set()
+
+    root.bind("<Escape>", lambda event:root.destroy())
+    root.mainloop()
 
 
 if __name__ == '__main__':
