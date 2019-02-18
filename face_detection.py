@@ -94,15 +94,6 @@ class FaceDetection(Thread):
                         cv2.putText(frame, str(i + 1), (x - 10, y - 10),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.35, (0, 0, 255), 1)
 
-            # show the frame
-            if self.show_display:
-                cv2.imshow("Frame", frame)
-                key = cv2.waitKey(1) & 0xFF
-
-            # if the `q` key was pressed, break from the loop
-            if key == ord("q"):
-                break
-
         # do a bit of cleanup
         cv2.destroyAllWindows()
         vs.stop()
