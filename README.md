@@ -16,7 +16,10 @@ activate SmartMirror
 cd cd do SmartMirror
 python hello.py
 
+conda list -e > env.txt #Save all the info about packages to your folder
 
+Naredba za instalirat sve iz env.txt:
+for /f %i in (env.txt) do conda install --yes %i
 
 POKRETANJE NA LINUXU
 -----------------------
