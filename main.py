@@ -39,9 +39,13 @@ class Printer(Thread): #sluzi kao demo da vidimo sta se dogada u pozadini (s pri
         with self.lock:
             self._value = has_face
 
-def gui_check_face(has_face):
+def gui_check_face(has_face, clock):
     global GUI_HAS_FACE
     GUI_HAS_FACE = has_face
+    if GUI_HAS_FACE:
+        clock.config(text='has face')
+    else:
+        clock.config(text='no face')
 
 def main():
     global GUI_HAS_FACE
@@ -53,8 +57,7 @@ def main():
     p = Printer(1)
     p.start()
 
-    face = FaceDetection(args.shape_predictor, face_callbacks=[p.face_update, gui_check_face])
-    face.start()
+
 
     def tick():
         time_string = time.strftime("%H:%M:%S")
@@ -62,11 +65,17 @@ def main():
         clock.after(200, tick)
 
     root = Tk()
+    clock = Label(root, font=("times", 50, "bold"), bg="black", fg="white")
+
+    temp_f = lambda has_face: gui_check_face(has_face, clock) #lambda je temporary funkcija u pythonu
+    face = FaceDetection(args.shape_predictor, face_callbacks=[p.face_update, temp_f])
+    face.start()
 
     if GUI_HAS_FACE:
-        clock = Label(root, font=("times", 50, "bold"), bg= "black", fg = "white")
+        pass
     else:
-        clock = Label(root, font=("times", 50, "bold"), bg= "blue", fg = "red")
+        pass
+
 
     clock.grid(row=0, column=0)
     tick()
