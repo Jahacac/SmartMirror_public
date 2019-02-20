@@ -13,7 +13,7 @@ import cv2
 from tkinter import *
 import time
 
-GUI_HAS_FACE = True
+GUI_HAS_FACE = False
 
 from face_detection import FaceDetection
 
@@ -56,7 +56,7 @@ def main():
     p.start()
 
     def tick():
-        time_string = time.strftime("%H:%M:%S") + " " + GUI_HAS_FACE
+        time_string = time.strftime("%H:%M:%S") + " " + str(GUI_HAS_FACE)
         clock.config(text=time_string)
         clock.after(200, tick)
 
