@@ -13,6 +13,8 @@ import cv2
 from tkinter import *
 import time
 
+GUI_HAS_FACE = True
+
 from face_detection import FaceDetection
 
 class Printer(Thread): #sluzi kao demo da vidimo sta se dogada u pozadini (s printanjem)
@@ -37,7 +39,12 @@ class Printer(Thread): #sluzi kao demo da vidimo sta se dogada u pozadini (s pri
         with self.lock:
             self._value = has_face
 
-def main(): #
+def gui_check_face(has_face):
+    global GUI_HAS_FACE
+    GUI_HAS_FACE = has_face
+
+def main():
+    global GUI_HAS_FACE
     ap = argparse.ArgumentParser()
     ap.add_argument("-p", "--shape-predictor", required=True, #ili p ili shape predictor se koriste u commandlineu, true jer je obavezno
         help="path to facial landmark predictor") #kad upisemo help u cl nam to ispise
@@ -46,7 +53,7 @@ def main(): #
     p = Printer(1)
     p.start()
 
-    face = FaceDetection(args.shape_predictor, face_callbacks=[p.face_update])
+    face = FaceDetection(args.shape_predictor, face_callbacks=[p.face_update, gui_check_face])
     face.start()
 
     def tick():
@@ -55,11 +62,16 @@ def main(): #
         clock.after(200, tick)
 
     root = Tk()
-    clock = Label(root, font=("times", 50, "bold"), bg= "black", fg = "white")
+
+    if GUI_HAS_FACE:
+        clock = Label(root, font=("times", 50, "bold"), bg= "black", fg = "white")
+    else:
+        clock = Label(root, font=("times", 50, "bold"), bg= "blue", fg = "red")
+
     clock.grid(row=0, column=0)
     tick()
 
-    root.configure(background='black')
+    #root.configure(background='black')
     #root.attributes('-fullscreen',True)
 
     root.wm_attributes("-topmost", 1)
