@@ -57,7 +57,7 @@ def main():
     p.start()
 
     gui = Gui(False) #konstruktor za gui + salje se pocetna vrijednost flag-a za lice
-    gui.start()
+    #gui.start()
 
     face = FaceDetection(args.shape_predictor, face_callbacks=[p.face_update, gui.check_face]) #konstruktor za facedetection + salje flagove za lice u navedene funkcije (face_update, check_face)
     face.start()
