@@ -16,6 +16,7 @@ import time
 GUI_HAS_FACE = False
 
 from face_detection import FaceDetection
+from gui import Gui
 
 class Printer(Thread): #sluzi kao demo da vidimo sta se dogada u pozadini (s printanjem)
     #za dretve u ovom slucaju koristimo klase; napravimo klasu, njen konstruktor (koj nije obavezan)
@@ -52,37 +53,17 @@ def main():
         help="path to facial landmark predictor") #kad upisemo help u cl nam to ispise
     args = ap.parse_args()
 
-    p = Printer(1)
+    p = Printer(False) #konstruktor za printer + salje se pocetna vrijednost flag-a za lice
     p.start()
 
-    def tick():
-        time_string = time.strftime("%H:%M:%S") + " " + str(GUI_HAS_FACE)
-        clock.config(text=time_string)
-        clock.after(200, tick)
+    gui = Gui(False) #konstruktor za gui + salje se pocetna vrijednost flag-a za lice
+    gui.start()
 
-    root = Tk()
-    clock = Label(root, font=("times", 50, "bold"), bg="black", fg="white")
-
-    face = FaceDetection(args.shape_predictor, face_callbacks=[p.face_update, gui_check_face])
+    face = FaceDetection(args.shape_predictor, face_callbacks=[p.face_update, gui.check_face]) #konstruktor za facedetection + salje flagove za lice u navedene funkcije (face_update, check_face)
     face.start()
 
-    if GUI_HAS_FACE:
-        pass
-    else:
-        pass
 
-
-    clock.grid(row=0, column=0)
-    tick()
-
-    #root.configure(background='black')
-    #root.attributes('-fullscreen',True)
-
-    root.wm_attributes("-topmost", 1)
-    root.focus_set()
-
-    root.bind("<Escape>", lambda event:root.destroy())
-    root.mainloop()
+    gui.mainloop() #uvijek mora bit na kraju
 
 
 if __name__ == '__main__':

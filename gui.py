@@ -1,7 +1,53 @@
 # smartmirror.py
 # requirements
 # requests, feedparser, traceback, Pillow
+from tkinter import *
+import time
+from threading import Lock, Thread
 
+root = Tk() #globalne varijable koje ce gui 100% koristit i funkcijama upravljamo njima, pokusala sam da nebudu globalne al je tlaka tlaka tlaka^4 nije mi radilo
+clock = Label(root, font=("times", 50, "bold"), bg= "black", fg = "white")
+
+class Gui(Thread):
+
+    def __init__(self, value): #konstruktor, tu imamo value (face flag-kad inicijliziramo je False, poslje se mijenja sa check_face) jer poslje value koristimo u svim funkcijama pa da nebude globalna varijabla
+        Thread.__init__(self)
+        self.value = value
+        self.lock = Lock()
+
+    def check_face(self, has_face): #ovu funkciju saljemo poslje u facedetection pomocu face_callbacka i hvatamo flag za lice
+        self.value = has_face #postavljamo novu vrijednost value-a
+
+    def tick(self):
+        global clock #ovo "global blabla" nam treba jer inace nebi mijenjao globalnu varijablu nego stvorio novu lokalnu (il jeo govna da varijabla nije deklarirana)
+        time_string = time.strftime("%H:%M:%S") + " " + str(self.value) #na string sata dodajemo flag za lice
+        clock.config(text=time_string)
+        clock.after(200, self.tick)
+
+    def run(self):
+        global root
+        global clock
+
+        clock.grid(row=0, column=0)
+        self.tick()
+
+        #root.configure(background='black') #ako su odkomentirane ove linije onda ne radi kako spada
+        #root.overrideredirect(True)
+        #root.overrideredirect(False)
+        #root.attributes('-fullscreen',True) #fullscreen sam makla tek tako da vidim dal se flagovi dobro salju (gledala u ispis printera i gui)
+
+        root.wm_attributes("-topmost", 1)
+        root.focus_set()
+
+        root.bind("<Escape>", lambda event:root.destroy())
+        #root.after(10000, root.destroy)
+
+    def mainloop(self): #da se root mainloop ne pozove odmah
+        global root
+        root.mainloop()
+
+
+"""
 import tkinter
 import locale
 import threading
@@ -133,32 +179,7 @@ if __name__ == '__main__':
     w.tk.mainloop()
 
 """
-from tkinter import *
-import time
 
-def tick():
-    time_string = time.strftime("%H:%M:%S")
-    clock.config(text=time_string)
-    clock.after(200, tick)
-
-root = Tk()
-clock = Label(root, font=("times", 50, "bold"), bg= "black", fg = "white")
-clock.grid(row=0, column=0)
-tick()
-
-root.configure(background='black')
-root.overrideredirect(True)
-root.overrideredirect(False)
-root.attributes('-fullscreen',True)
-
-root.wm_attributes("-topmost", 1)
-root.focus_set()
-
-root.bind("<Escape>", lambda event:root.destroy())
-root.after(10000, root.destroy)
-
-root.mainloop()
-"""
 
 """
 Ako se pise ovako kod^ nemoze se poslje importat u mainu i izvrsit kao zasebna dretva jer kad 
