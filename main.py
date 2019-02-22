@@ -53,10 +53,10 @@ def main():
         help="path to facial landmark predictor") #kad upisemo help u cl nam to ispise
     args = ap.parse_args()
 
-    p = Printer(False) #konstruktor za printer + salje se pocetna vrijednost flag-a za lice
+    p = Printer(value = False) #konstruktor za printer + salje se pocetna vrijednost flag-a za lice
     p.start()
 
-    gui = Gui(False) #konstruktor za gui + salje se pocetna vrijednost flag-a za lice
+    gui = Gui(value = False) #konstruktor za gui + salje se pocetna vrijednost flag-a za lice
     #gui.start()
 
     face = FaceDetection(args.shape_predictor, face_callbacks=[p.face_update, gui.check_face]) #konstruktor za facedetection + salje flagove za lice u navedene funkcije (face_update, check_face)
