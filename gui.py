@@ -10,7 +10,6 @@ from threading import Lock, Thread
 class Gui:
 
     def __init__(self, value): #konstruktor, tu imamo value (face flag-kad inicijliziramo je False, poslje se mijenja sa check_face) jer poslje value koristimo u svim funkcijama pa da nebude globalna varijabla
-        Thread.__init__(self)
         self.value = value
         self.lock = Lock()
         self.root = Tk() #globalne varijable koje ce gui 100% koristit i funkcijama upravljamo njima, pokusala sam da nebudu globalne al je tlaka tlaka tlaka^4 nije mi radilo
