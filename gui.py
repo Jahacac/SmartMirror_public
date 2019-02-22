@@ -18,10 +18,10 @@ class Gui:
         self.clock.grid(row=0, column=0)
         self.tick()
 
-        #root.configure(background='black') #ako su odkomentirane ove linije onda ne radi kako spada
-        #root.overrideredirect(True)
-        #root.overrideredirect(False)
-        #root.attributes('-fullscreen',True) #fullscreen sam makla tek tako da vidim dal se flagovi dobro salju (gledala u ispis printera i gui)
+        #self.root.configure(background='black') #treba dodat tipka za gasenje
+        #self.root.overrideredirect(True)
+        #self.root.overrideredirect(False)
+        #self.root.attributes('-fullscreen',True) #fullscreen sam makla tek tako da vidim dal se flagovi dobro salju (gledala u ispis printera i gui)
 
         self.root.wm_attributes("-topmost", 1)
         self.root.focus_set()
