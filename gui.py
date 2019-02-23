@@ -5,7 +5,12 @@ import tkinter
 import locale
 import threading
 import time
+import requests
+import json
+import traceback
+import feedparser
 
+from PIL import Image, ImageTk
 from contextlib import contextmanager
 
 LOCALE_LOCK = threading.Lock()
@@ -13,6 +18,12 @@ LOCALE_LOCK = threading.Lock()
 ui_locale = ''
 time_format = 24 # 12/24
 date_format = "%B %d, %Y"
+weather_api_token = '60da1605a073d3b86186ab70ccfd9f79' #darksky api key
+#https://api.darksky.net/forecast/60da1605a073d3b86186ab70ccfd9f79/37.8267,-122.4233
+weather_lang = 'hr'
+weather_unit = 'auto' #si, auto
+latitude = '45.327065' # Rijeka, Croatia
+longitude = '14.442176'
 xlarge_text_size = 94
 large_text_size = 48
 medium_text_size = 28
@@ -26,6 +37,23 @@ def setlocale(name):
             yield locale.setlocale(locale.LC_ALL, name)
         finally:
             locale.setlocale(locale.LC_ALL, saved)
+
+#postavimo ikonicu ovisno o vremenu
+icon_lookup = {
+    'clear-day': "assets/Sun.png",
+    'wind': "assets/Wind.png",
+    'cloudy': "assets/Cloud.png",
+    'partly-cloudy-day': "assets/PartlySunny.png",
+    'rain': "assets/Rain.png",
+    'snow': "assets/Snow.png",
+    'snow-thin': "assets/Snow.png",
+    'fog': "assets/Haze.png",
+    'clear-night': "assets/Moon.png",
+    'partly-cloudy-night': "assets/PartlyMoon.png",
+    'thunderstorm': "assets/Storm.png",
+    'tornado': "assests/Tornado.png",
+    'hail': "assests/Hail.png"
+}
 
 class Gui:
 
@@ -57,6 +85,26 @@ class Gui:
         self.fdetection.pack(side=tkinter.TOP, anchor=tkinter.E)
 
         self.tick()
+
+        #weather
+        self.temperature = ''
+        self.forecast = ''
+        self.location = ''
+        self.currently = ''
+        self.icon = ''
+        self.degreeFrm = Frame(self.root, bg="black")
+        self.degreeFrm.pack(side=TOP, anchor=W)
+        self.temperatureLbl = Label(self.degreeFrm, font=('Helvetica', xlarge_text_size), fg="white", bg="black")
+        self.temperatureLbl.pack(side=LEFT, anchor=N)
+        self.iconLbl = Label(self.degreeFrm, bg="black")
+        self.iconLbl.pack(side=LEFT, anchor=N, padx=20)
+        self.currentlyLbl = Label(self.root, font=('Helvetica', medium_text_size), fg="white", bg="black")
+        self.currentlyLbl.pack(side=TOP, anchor=W)
+        self.forecastLbl = Label(self.root, font=('Helvetica', small_text_size), fg="white", bg="black")
+        self.forecastLbl.pack(side=TOP, anchor=W)
+        self.locationLbl = Label(self.root, font=('Helvetica', small_text_size), fg="white", bg="black")
+        self.locationLbl.pack(side=TOP, anchor=W)
+        self.get_weather()
 
         self.root.wm_attributes("-topmost", 1)
         self.root.focus_set()
@@ -91,6 +139,89 @@ class Gui:
         self.fdetection['text'] = str(self.value)
         self.timeLbl.after(200, self.tick)
 
+    def get_ip(self):
+        try:
+            ip_url = "http://jsonip.com/"
+            req = requests.get(ip_url)
+            ip_json = json.loads(req.text)
+            return ip_json['ip']
+        except Exception as e:
+            traceback.print_exc()
+            return "Error: %s. Cannot get ip." % e
+
+    def get_weather(self):
+        try:
+            if latitude is None and longitude is None:
+                # get location
+                location_req_url = "http://freegeoip.net/json/%s" % self.get_ip()
+                r = requests.get(location_req_url)
+                location_obj = json.loads(r.text)
+
+                lat = location_obj['latitude']
+                lon = location_obj['longitude']
+
+                location2 = "%s, %s" % (location_obj['city'], location_obj['region_code'])
+
+                # get weather
+                weather_req_url = "https://api.darksky.net/forecast/%s/%s,%s?lang=%s&units=%s" % (weather_api_token, lat,lon,weather_lang,weather_unit)
+            else:
+                location2 = ""
+                # get weather
+                weather_req_url = "https://api.darksky.net/forecast/%s/%s,%s?lang=%s&units=%s" % (weather_api_token, latitude, longitude, weather_lang, weather_unit)
+
+            r = requests.get(weather_req_url)
+            weather_obj = json.loads(r.text)
+
+            degree_sign= u'\N{DEGREE SIGN}'
+            temperature2 = "%s%s" % (str(int(weather_obj['currently']['temperature'])), degree_sign)
+            currently2 = weather_obj['currently']['summary']
+            forecast2 = weather_obj["hourly"]["summary"]
+
+            icon_id = weather_obj['currently']['icon']
+            icon2 = None
+
+            if icon_id in icon_lookup:
+                icon2 = icon_lookup[icon_id]
+
+            if icon2 is not None:
+                if self.icon != icon2:
+                    self.icon = icon2
+                    image = Image.open(icon2)
+                    image = image.resize((100, 100), Image.ANTIALIAS)
+                    image = image.convert('RGB')
+                    photo = ImageTk.PhotoImage(image)
+
+                    self.iconLbl.config(image=photo)
+                    self.iconLbl.image = photo
+            else:
+                # remove image
+                self.iconLbl.config(image='')
+
+            if self.currently != currently2:
+                self.currently = currently2
+                self.currentlyLbl.config(text=currently2)
+            if self.forecast != forecast2:
+                self.forecast = forecast2
+                self.forecastLbl.config(text=forecast2)
+            if self.temperature != temperature2:
+                self.temperature = temperature2
+                self.temperatureLbl.config(text=temperature2)
+            if self.location != location2:
+                if location2 == ", ":
+                    self.location = "Cannot Pinpoint Location"
+                    self.locationLbl.config(text="Cannot Pinpoint Location")
+                else:
+                    self.location = location2
+                    self.locationLbl.config(text=location2)
+        except Exception as e:
+            traceback.print_exc()
+            print ("Error: %s. Cannot get weather." % e)
+
+        self.root.after(600000, self.get_weather)
+
+    @staticmethod
+    def convert_kelvin_to_fahrenheit(kelvin_temp):
+        return 1.8 * (kelvin_temp - 273) + 32
+
     def mainloop(self): #da se root mainloop ne pozove odmah
         self.root.mainloop()
-
