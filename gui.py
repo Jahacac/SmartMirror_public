@@ -21,11 +21,11 @@ date_format = "%B %d, %Y"
 weather_api_token = '60da1605a073d3b86186ab70ccfd9f79' #darksky api key
 #https://api.darksky.net/forecast/60da1605a073d3b86186ab70ccfd9f79/37.8267,-122.4233
 weather_lang = 'hr'
-weather_unit = 'auto' #si, auto
+weather_unit = 'auto'
 latitude = '45.327065' # Rijeka, Croatia
 longitude = '14.442176'
 xlarge_text_size = 94
-large_text_size = 48
+large_text_size = 58
 medium_text_size = 28
 small_text_size = 18
 
@@ -60,50 +60,64 @@ class Gui:
     def __init__(self, value): #konstruktor, tu imamo value (face flag-kad inicijliziramo je False, poslje se mijenja sa check_face) jer poslje value koristimo u svim funkcijama pa da nebude globalna varijabla
         self.value = value
         self.lock = Lock()
+
+        #prvo napravimo root koji nam je cijela 'površina' za gui
         self.root = Tk() #globalne varijable koje ce gui 100% koristit i funkcijama upravljamo njima, pokusala sam da nebudu globalne al je tlaka tlaka tlaka^4 nije mi radilo
-        self.clock = Label(self.root, font=("times", 50, "bold"), bg= "black", fg = "white")
+        self.root.configure(background='black')
+        self.root.attributes('-fullscreen',True)
 
-        self.root.configure(background='black') #treba dodat tipka za gasenje
-        #self.root.overrideredirect(True)
-        #self.root.overrideredirect(False)
-        self.root.attributes('-fullscreen',True) #fullscreen sam makla tek tako da vidim dal se flagovi dobro salju (gledala u ispis printera i gui)
+        #definiramo topFrame unutar kojeg cemo imati 2 Framea- time i weather(mora se ovako da budu u istom redu)
+        self.topFrame = Frame(self.root, width=1350, height=50)
+        self.topFrame.pack(side=TOP, fill=X, expand=1, anchor=N)
+        self.topFrame.configure(background='black')
 
+        #timeFrame - lijevo
+        self.timeFrame = Frame(self.topFrame)
+        self.timeFrame.pack(side=RIGHT, anchor=NE)
+        self.timeFrame.configure(background='black')
+
+        #LABELE za timeFrame - vrijeme, datum lala:
         #time label
         self.time1 = ''
-        self.timeLbl = tkinter.Label(self.root, font=('Helvetica', large_text_size), fg="white", bg="black")
-        self.timeLbl.pack(side=tkinter.TOP, anchor=tkinter.E)
+        self.timeLbl = tkinter.Label(self.timeFrame, font=('Helvetica', large_text_size), fg="white", bg="black")
+        self.timeLbl.pack(side=tkinter.TOP, anchor=tkinter.NE)
         #dan u tjednu label
         self.day_of_week1 = ''
-        self.dayOWLbl = tkinter.Label(self.root, text=self.day_of_week1, font=('Helvetica', small_text_size), fg="white", bg="black")
+        self.dayOWLbl = tkinter.Label(self.timeFrame, text=self.day_of_week1, font=('Helvetica', small_text_size), fg="white", bg="black")
         self.dayOWLbl.pack(side=tkinter.TOP, anchor=tkinter.E)
         #date label
         self.date1 = ''
-        self.dateLbl = tkinter.Label(self.root, text=self.date1, font=('Helvetica', small_text_size), fg="white", bg="black")
+        self.dateLbl = tkinter.Label(self.timeFrame, text=self.date1, font=('Helvetica', small_text_size), fg="white", bg="black")
         self.dateLbl.pack(side=tkinter.TOP, anchor=tkinter.E)
         #facedetection label
-        self.fdetection = tkinter.Label(self.root, text=self.value, font=('Helvetica', small_text_size), fg="white", bg="black")
+        self.fdetection = tkinter.Label(self.timeFrame, text=self.value, font=('Helvetica', small_text_size), fg="white", bg="black")
         self.fdetection.pack(side=tkinter.TOP, anchor=tkinter.E)
 
         self.tick()
 
-        #weather
+        #weatherFrame - desno - ista priča
+        self.weatherFrame = Frame(self.topFrame, width=100, height=50)
+        self.weatherFrame.pack(side=LEFT)
+        self.weatherFrame.configure(background='black')
+
         self.temperature = ''
         self.forecast = ''
         self.location = ''
         self.currently = ''
         self.icon = ''
-        self.degreeFrm = Frame(self.root, bg="black")
-        self.degreeFrm.pack(side=TOP, anchor=W)
+        self.degreeFrm = Frame(self.weatherFrame, bg="black")
+        self.degreeFrm.pack(side=TOP, anchor=NW)
         self.temperatureLbl = Label(self.degreeFrm, font=('Helvetica', xlarge_text_size), fg="white", bg="black")
-        self.temperatureLbl.pack(side=LEFT, anchor=N)
+        self.temperatureLbl.pack(side=LEFT, anchor=NW)
         self.iconLbl = Label(self.degreeFrm, bg="black")
-        self.iconLbl.pack(side=LEFT, anchor=N, padx=20)
-        self.currentlyLbl = Label(self.root, font=('Helvetica', medium_text_size), fg="white", bg="black")
-        self.currentlyLbl.pack(side=TOP, anchor=W)
-        self.forecastLbl = Label(self.root, font=('Helvetica', small_text_size), fg="white", bg="black")
-        self.forecastLbl.pack(side=TOP, anchor=W)
-        self.locationLbl = Label(self.root, font=('Helvetica', small_text_size), fg="white", bg="black")
-        self.locationLbl.pack(side=TOP, anchor=W)
+        self.iconLbl.pack(side=LEFT, anchor=NW, padx=20)
+        self.currentlyLbl = Label(self.weatherFrame, font=('Helvetica', medium_text_size), fg="white", bg="black")
+        self.currentlyLbl.pack(side=TOP, anchor=NW)
+        self.forecastLbl = Label(self.weatherFrame, font=('Helvetica', small_text_size), fg="white", bg="black")
+        self.forecastLbl.pack(side=TOP, anchor=NW)
+        self.locationLbl = Label(self.weatherFrame, font=('Helvetica', small_text_size), fg="white", bg="black")
+        self.locationLbl.pack(side=TOP, anchor=NW)
+
         self.get_weather()
 
         self.root.wm_attributes("-topmost", 1)
@@ -138,16 +152,6 @@ class Gui:
         #mijenjamo vrijednost labela za facedetection True/False
         self.fdetection['text'] = str(self.value)
         self.timeLbl.after(200, self.tick)
-
-    def get_ip(self):
-        try:
-            ip_url = "http://jsonip.com/"
-            req = requests.get(ip_url)
-            ip_json = json.loads(req.text)
-            return ip_json['ip']
-        except Exception as e:
-            traceback.print_exc()
-            return "Error: %s. Cannot get ip." % e
 
     def get_weather(self):
         try:
@@ -219,9 +223,6 @@ class Gui:
 
         self.root.after(600000, self.get_weather)
 
-    @staticmethod
-    def convert_kelvin_to_fahrenheit(kelvin_temp):
-        return 1.8 * (kelvin_temp - 273) + 32
-
     def mainloop(self): #da se root mainloop ne pozove odmah
         self.root.mainloop()
+
