@@ -7,7 +7,7 @@ def scrape_me():
     naslovi = soup.find_all('h3')
     opisi = soup.findAll("div", {"class": "summary"})
     datumi = soup.find_all('dd')
-    file = open("C:/Users/Korisnik/PycharmProjects/SmartMirrorV2/data.txt", "w")
+    file = open("data.txt", "w")
     file.write("###\n") #kao neki delimiter između novih vijesti
     for i in range(len(naslovi)):
         vijest = datumi[i].get_text() + naslovi[i].get_text() + opisi[i].get_text() + "\n" + "###\n"
