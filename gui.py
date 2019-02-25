@@ -1,5 +1,5 @@
 from tkinter import *
-from threading import Lock, Thread
+from threading import Lock, Thread, Timer
 
 import tkinter
 import locale
@@ -8,10 +8,17 @@ import time
 import requests
 import json
 import traceback
+import riteh_scraping
 import feedparser
 
 from PIL import Image, ImageTk
 from contextlib import contextmanager
+
+counter = 0
+riteh_scraping.scrape_me() #na početku pozovemu funkciju za scrapanje da dobijemo najnovije podatke
+file = open("data.txt", "r")
+lines = file.readlines()
+len_lines = len(lines)
 
 LOCALE_LOCK = threading.Lock()
 
@@ -28,6 +35,8 @@ xlarge_text_size = 94
 large_text_size = 58
 medium_text_size = 28
 small_text_size = 18
+notification_text_size=25
+
 
 @contextmanager
 def setlocale(name):
@@ -58,6 +67,7 @@ icon_lookup = {
 class Gui:
 
     def __init__(self, value): #konstruktor, tu imamo value (face flag-kad inicijliziramo je False, poslje se mijenja sa check_face) jer poslje value koristimo u svim funkcijama pa da nebude globalna varijabla
+        self.BottomFrame = None
         self.value = value
         self.lock = Lock()
 
@@ -117,8 +127,32 @@ class Gui:
         self.forecastLbl.pack(side=TOP, anchor=NW)
         self.locationLbl = Label(self.weatherFrame, font=('Helvetica', small_text_size), fg="white", bg="black")
         self.locationLbl.pack(side=TOP, anchor=NW)
-
         self.get_weather()
+
+        # BottomFrame za vijesti
+        self.BottomFrame = Frame(self.root, height=800, width=800)
+        self.BottomFrame.pack(side=BOTTOM, fill=X, expand=1, anchor=CENTER)
+        self.BottomFrame.configure(background='black')
+
+        #BottomFrame dijelim na dva za notifikacije svaki od njih ima datum,naslov i opis
+        self.Not1Frm = Frame(self.BottomFrame, bg="black", width=400)
+        self.Not1Frm.pack(side=LEFT, anchor=NW)
+        self.date1 = Label(self.Not1Frm, font=('Helvetica', 11, 'bold'), fg="white", bg="black")
+        self.date1.pack(anchor=W)
+        self.naslov1 = Label(self.Not1Frm, font=('Helvetica', 15), fg="white", bg="black", justify=LEFT, wraplength=500)
+        self.naslov1.pack(anchor=W)
+        self.not1 = Label(self.Not1Frm, font=('Helvetica', 13), fg="white", bg="black", justify=LEFT, wraplength=400)
+        self.not1.pack(anchor=W)
+
+        self.Not2Frm = Frame(self.BottomFrame, bg="black", width=400)
+        self.Not2Frm.pack(anchor=N)
+        self.date2 = Label(self.Not2Frm, font=('Helvetica', 11, 'bold'),  fg="white", bg="black")
+        self.date2.pack(anchor=W)
+        self.naslov2 = Label(self.Not2Frm, font=('Helvetica', 15), fg="white", bg="black", justify=LEFT, wraplength=500)
+        self.naslov2.pack(anchor=W)
+        self.not2 = Label(self.Not2Frm, font=('Helvetica', 13), fg="white", bg="black", justify=LEFT, wraplength=400)
+        self.not2.pack(anchor=W)
+        self.notification();
 
         self.root.wm_attributes("-topmost", 1)
         self.root.focus_set()
@@ -129,7 +163,11 @@ class Gui:
 
     def check_face(self, has_face): #ovu funkciju saljemo poslje u facedetection pomocu face_callbacka i hvatamo flag za lice
         self.value = has_face #postavljamo novu vrijednost value-a
-
+        """"
+        if(self.value): #problem je kad lice nestane taj vrijeme je i idalje tu
+            self.get_weather()
+            self.notification()
+        """
     def tick(self):
         with setlocale(ui_locale):
             if time_format == 12:
@@ -150,8 +188,45 @@ class Gui:
                 self.date1 = date2
                 self.dateLbl.config(text=date2)
         #mijenjamo vrijednost labela za facedetection True/False
+        
         self.fdetection['text'] = str(self.value)
         self.timeLbl.after(200, self.tick)
+
+
+    def notification(self):
+        global counter
+        global lines
+        global len_lines
+
+        #notifikacija 1
+        if (lines[counter] == "###\n" and counter != len_lines - 1):
+            str = ''
+            counter += 1
+            self.date1.config(text=lines[counter])
+            counter += 1
+            self.naslov1.config(text=lines[counter])
+            counter += 1
+            while lines[counter] != "###\n" and counter != len_lines - 1:
+                str += lines[counter]
+                counter += 1
+            self.not1.config(text=str)
+
+        #notifikacija 2 besssssramno opet kopiran kod
+        if (lines[counter] == "###\n" and counter != len_lines - 1):
+            str = ''
+            counter += 1
+            self.date2.config(text=lines[counter])
+            counter += 1
+            self.naslov2.config(text=lines[counter])
+            counter += 1
+            while lines[counter] != "###\n" and counter != len_lines - 1:
+                str += lines[counter]
+                counter += 1
+            self.not2.config(text=str)
+        if(counter == len_lines-1):
+            counter = 0
+        #i sad tu neki timer koji će pozvati ovu funkciju opet nakon 10 sek da se promijeni tekst i onda counter opet šiba dalje
+
 
     def get_weather(self):
         try:
