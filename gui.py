@@ -111,12 +111,6 @@ class Gui:
         self.iconWave.config(image=self.wave_photo)
         self.iconWave.image = self.wave_photo
 
-
-        """"
-        self.myCanvas = Canvas(self.timeFrame, bg="black", height=120, width=100, bd=0, highlightthickness=0)
-        self.myCanvas.create_oval(100, 100, 20, 20, fill="#fff")
-        self.myCanvas.pack(side=RIGHT, expand=1, anchor=NE)
-        """
         self.tick()
         self.root.wm_attributes("-topmost", 1)
         self.root.focus_set()
@@ -187,7 +181,6 @@ class Gui:
         if(has_face):
             self.init_gui()
         else:
-            time.sleep(5)
             self.destroy_gui()
 
     def tick(self):
@@ -213,8 +206,11 @@ class Gui:
         #mijenjamo vrijednost labela za facedetection True/False
         if(self.value):
             self.fdetection['text'] = str("Dobrodošli u SmartMirror!")
+            self.iconWave['image'] = self.wave_photo
         else:
             self.fdetection['text'] = str("Stanite ispred ogledala")
+            self.iconWave['image'] = ""
+
         self.timeLbl.after(200, self.tick)
 
 
