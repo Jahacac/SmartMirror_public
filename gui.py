@@ -101,6 +101,9 @@ class Gui:
         #facedetection label
         self.fdetection = tkinter.Label(self.timeFrame, text=self.value, font=('Helvetica', small_text_size), fg="white", bg="black")
         self.fdetection.pack(side=tkinter.TOP, anchor=tkinter.E)
+        self.myCanvas = Canvas(self.timeFrame, bg="black", height=120, width=100, bd=0, highlightthickness=0)
+        self.myCanvas.create_oval(100, 100, 20, 20, fill="#fff")
+        self.myCanvas.pack(side=RIGHT, expand=1, anchor=NE)
         self.tick()
 
         self.root.wm_attributes("-topmost", 1)
