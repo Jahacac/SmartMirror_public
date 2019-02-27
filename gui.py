@@ -101,11 +101,23 @@ class Gui:
         #facedetection label
         self.fdetection = tkinter.Label(self.timeFrame, text=self.value, font=('Helvetica', small_text_size), fg="white", bg="black")
         self.fdetection.pack(side=tkinter.TOP, anchor=tkinter.E)
+
+        self.iconWave = Label(self.timeFrame, bg="black", width=150, height=150)
+        self.iconWave.pack(side=RIGHT, anchor=NW, padx=10)
+        self.wave_image=Image.open("assets/wave.jpg")
+        self.wave_image = self.wave_image.resize((100, 100), Image.ANTIALIAS)
+        self.wave_image = self.wave_image.convert('RGB')
+        self.wave_photo = ImageTk.PhotoImage(self.wave_image)
+        self.iconWave.config(image=self.wave_photo)
+        self.iconWave.image = self.wave_photo
+
+
+        """"
         self.myCanvas = Canvas(self.timeFrame, bg="black", height=120, width=100, bd=0, highlightthickness=0)
         self.myCanvas.create_oval(100, 100, 20, 20, fill="#fff")
         self.myCanvas.pack(side=RIGHT, expand=1, anchor=NE)
+        """
         self.tick()
-
         self.root.wm_attributes("-topmost", 1)
         self.root.focus_set()
 
