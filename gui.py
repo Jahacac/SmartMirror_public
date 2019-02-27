@@ -187,6 +187,7 @@ class Gui:
         if(has_face):
             self.init_gui()
         else:
+            time.sleep(5)
             self.destroy_gui()
 
     def tick(self):
