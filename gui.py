@@ -198,7 +198,10 @@ class Gui:
                 self.dateLbl.config(text=date2)
 
         #mijenjamo vrijednost labela za facedetection True/False
-        self.fdetection['text'] = str(self.value)
+        if(self.value):
+            self.fdetection['text'] = str("Dobrodošli u SmartMirror!")
+        else:
+            self.fdetection['text'] = str("Stanite ispred ogledala")
         self.timeLbl.after(200, self.tick)
 
 
