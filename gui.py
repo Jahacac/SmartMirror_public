@@ -67,12 +67,11 @@ icon_lookup = {
 class Gui:
 
     def __init__(self, value): #konstruktor, tu imamo value (face flag-kad inicijliziramo je False, poslje se mijenja sa check_face) jer poslje value koristimo u svim funkcijama pa da nebude globalna varijabla
-        self.BottomFrame = None
         self.value = value
         self.lock = Lock()
 
         #prvo napravimo root koji nam je cijela 'površina' za gui
-        self.root = Tk() #globalne varijable koje ce gui 100% koristit i funkcijama upravljamo njima, pokusala sam da nebudu globalne al je tlaka tlaka tlaka^4 nije mi radilo
+        self.root = Tk() #globalne varijable koje ce gui 100% koristit i funkcijama upravljamo njima
         self.root.configure(background='black')
         self.root.attributes('-fullscreen',True)
 
@@ -103,9 +102,6 @@ class Gui:
         self.fdetection = tkinter.Label(self.timeFrame, text=self.value, font=('Helvetica', small_text_size), fg="white", bg="black")
         self.fdetection.pack(side=tkinter.TOP, anchor=tkinter.E)
         self.tick()
-        #weatherFrame - desno - ista priča
-        self.init_weather()
-        self.init_notification()
 
         self.root.wm_attributes("-topmost", 1)
         self.root.focus_set()
@@ -137,9 +133,8 @@ class Gui:
             self.locationLbl.pack(side=TOP, anchor=NW)
 
     def init_notification(self):
-        self.BottomFrame = Frame(self.root, height=800, width=800)
+        self.BottomFrame = Frame(self.root, bg="black", height=800, width=800)
         self.BottomFrame.pack(side=BOTTOM, fill=X, expand=1, anchor=CENTER)
-        self.BottomFrame.configure(background='black')
         self.Not1Frm = Frame(self.BottomFrame, width=400, bg="black")
         self.Not1Frm.pack(side=LEFT, anchor=NW)
         self.date = Label(self.Not1Frm, font=('Helvetica', 11, 'bold'), fg="white", bg="black")
@@ -158,26 +153,19 @@ class Gui:
         self.not2 = Label(self.Not2Frm, font=('Helvetica', 13), fg="white", bg="black", justify=LEFT, wraplength=400)
         self.not2.pack(anchor=W)
 
-        """"
-        self.date = Label(self.Not1Frm, font=('Helvetica', medium_text_size), fg="white", bg="black")
-        self.date.pack()
-        self.naslov = Label(self.Not1Frm, font=('Helvetica', medium_text_size), fg="white", bg="black")
-        self.naslov.pack()
-        #BottomFrame dijelim na dva za notifikacije svaki od njih ima datum,naslov i opis
-        """
-
     def init_gui(self):
         self.init_weather()
         self.get_weather()
         self.init_notification()
         self.notification()
+
     def destroy_gui(self):
         global counter
         self.weatherFrame.destroy()
         self.BottomFrame.destroy()
         counter = 0
 
-    def check_face(self, has_face): #ovu funkciju saljemo poslje u facedetection pomocu face_callbacka i hvatamo flag za lice
+    def check_face(self, has_face): #ovu funkciju saljemo poslije u facedetection pomocu face_callbacka i hvatamo flag za lice
         flag = has_face
         self.value = has_face #postavljamo novu vrijednost value-a
 
@@ -205,8 +193,8 @@ class Gui:
             if date2 != self.date1:
                 self.date1 = date2
                 self.dateLbl.config(text=date2)
+
         #mijenjamo vrijednost labela za facedetection True/False
-        
         self.fdetection['text'] = str(self.value)
         self.timeLbl.after(200, self.tick)
 
@@ -215,17 +203,7 @@ class Gui:
         global counter
         global lines
         global len_lines
-        """"
-        dummy = str(lines[counter])
-        counter += 1
-        if(dummy != "###\n"):
-            self.date.config(text=dummy)
-            counter += 1
-            dummy = str(lines[counter])
-            self.naslov.config(text=dummy)
 
-        self.BottomFrame.after(200, self.notification)
-        """
         dummy = str(lines[counter])
         if (dummy == "###\n" and counter != len_lines - 1):
             lin = ''
@@ -241,6 +219,7 @@ class Gui:
                 counter += 1
             self.not1.config(text=lin)
         dummy = str(lines[counter])
+
         if (dummy == "###\n" and counter != len_lines - 1):
             lin = ''
             counter += 1
@@ -254,10 +233,12 @@ class Gui:
                 lin += str(lines[counter])
                 counter += 1
             self.not2.config(text=lin)
+
         if(counter == len_lines-1):
             counter = 0
 
         self.BottomFrame.after(3000, self.notification)
+
     def get_weather(self):
         try:
             location2 = ""
@@ -314,4 +295,3 @@ class Gui:
 
     def mainloop(self): #da se root mainloop ne pozove odmah
         self.root.mainloop()
-
