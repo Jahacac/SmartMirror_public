@@ -37,7 +37,6 @@ medium_text_size = 28
 small_text_size = 18
 notification_text_size=25
 
-
 @contextmanager
 def setlocale(name):
     with LOCALE_LOCK:
@@ -106,30 +105,41 @@ class Gui:
         self.tick()
 
         #weatherFrame - desno - ista priča
-        self.weatherFrame = Frame(self.topFrame, width=100, height=50)
-        self.weatherFrame.pack(side=LEFT)
-        self.weatherFrame.configure(background='black')
-
-        self.temperature = ''
-        self.forecast = ''
-        self.location = ''
-        self.currently = ''
-        self.icon = ''
-        self.degreeFrm = Frame(self.weatherFrame, bg="black")
-        self.degreeFrm.pack(side=TOP, anchor=NW)
-        self.temperatureLbl = Label(self.degreeFrm, font=('Helvetica', xlarge_text_size), fg="white", bg="black")
-        self.temperatureLbl.pack(side=LEFT, anchor=NW)
-        self.iconLbl = Label(self.degreeFrm, bg="black")
-        self.iconLbl.pack(side=LEFT, anchor=NW, padx=20)
-        self.currentlyLbl = Label(self.weatherFrame, font=('Helvetica', medium_text_size), fg="white", bg="black")
-        self.currentlyLbl.pack(side=TOP, anchor=NW)
-        self.forecastLbl = Label(self.weatherFrame, font=('Helvetica', small_text_size), fg="white", bg="black")
-        self.forecastLbl.pack(side=TOP, anchor=NW)
-        self.locationLbl = Label(self.weatherFrame, font=('Helvetica', small_text_size), fg="white", bg="black")
-        self.locationLbl.pack(side=TOP, anchor=NW)
-        self.get_weather()
+        self.init_weather()
 
         # BottomFrame za vijesti
+        self.init_notification()
+
+        self.root.wm_attributes("-topmost", 1)
+        self.root.focus_set()
+
+        self.root.bind("<Escape>", lambda event: self.root.destroy())
+        #self.root.after(10000, self.root.destroy)
+
+    def init_weather(self):
+            self.weatherFrame = Frame(self.topFrame, width=100, height=50)
+            self.weatherFrame.pack(side=LEFT)
+            self.weatherFrame.configure(background='black')
+
+            self.temperature = ''
+            self.forecast = ''
+            self.location = ''
+            self.currently = ''
+            self.icon = ''
+            self.degreeFrm = Frame(self.weatherFrame, bg="black")
+            self.degreeFrm.pack(side=TOP, anchor=NW)
+            self.temperatureLbl = Label(self.degreeFrm, font=('Helvetica', xlarge_text_size), fg="white", bg="black")
+            self.temperatureLbl.pack(side=LEFT, anchor=NW)
+            self.iconLbl = Label(self.degreeFrm, bg="black")
+            self.iconLbl.pack(side=LEFT, anchor=NW, padx=20)
+            self.currentlyLbl = Label(self.weatherFrame, font=('Helvetica', medium_text_size), fg="white", bg="black")
+            self.currentlyLbl.pack(side=TOP, anchor=NW)
+            self.forecastLbl = Label(self.weatherFrame, font=('Helvetica', small_text_size), fg="white", bg="black")
+            self.forecastLbl.pack(side=TOP, anchor=NW)
+            self.locationLbl = Label(self.weatherFrame, font=('Helvetica', small_text_size), fg="white", bg="black")
+            self.locationLbl.pack(side=TOP, anchor=NW)
+
+    def init_notification(self):
         self.BottomFrame = Frame(self.root, height=800, width=800)
         self.BottomFrame.pack(side=BOTTOM, fill=X, expand=1, anchor=CENTER)
         self.BottomFrame.configure(background='black')
@@ -152,22 +162,22 @@ class Gui:
         self.naslov2.pack(anchor=W)
         self.not2 = Label(self.Not2Frm, font=('Helvetica', 13), fg="white", bg="black", justify=LEFT, wraplength=400)
         self.not2.pack(anchor=W)
-        self.notification();
-
-        self.root.wm_attributes("-topmost", 1)
-        self.root.focus_set()
-
-        self.root.bind("<Escape>", lambda event: self.root.destroy())
-        #self.root.after(10000, self.root.destroy)
 
 
     def check_face(self, has_face): #ovu funkciju saljemo poslje u facedetection pomocu face_callbacka i hvatamo flag za lice
+        global counter
         self.value = has_face #postavljamo novu vrijednost value-a
-        """"
-        if(self.value): #problem je kad lice nestane taj vrijeme je i idalje tu
+
+        if(has_face): #problem je kad lice nestane taj vrijeme je i idalje tu
+            self.init_weather()
             self.get_weather()
+            self.init_notification()
             self.notification()
-        """
+        else:
+            self.weatherFrame.destroy()
+            self.BottomFrame.destroy()
+            counter = 0
+
     def tick(self):
         with setlocale(ui_locale):
             if time_format == 12:
@@ -200,33 +210,34 @@ class Gui:
 
         #notifikacija 1
         if (lines[counter] == "###\n" and counter != len_lines - 1):
-            str = ''
+            lin = ''
             counter += 1
             self.date1.config(text=lines[counter])
             counter += 1
             self.naslov1.config(text=lines[counter])
             counter += 1
             while lines[counter] != "###\n" and counter != len_lines - 1:
-                str += lines[counter]
+                lin += lines[counter]
                 counter += 1
-            self.not1.config(text=str)
+            self.not1.config(text=lin)
 
         #notifikacija 2 besssssramno opet kopiran kod
         if (lines[counter] == "###\n" and counter != len_lines - 1):
-            str = ''
+            lin = ''
             counter += 1
             self.date2.config(text=lines[counter])
             counter += 1
             self.naslov2.config(text=lines[counter])
             counter += 1
             while lines[counter] != "###\n" and counter != len_lines - 1:
-                str += lines[counter]
+                lin += lines[counter]
                 counter += 1
-            self.not2.config(text=str)
+            self.not2.config(text=lin)
         if(counter == len_lines-1):
             counter = 0
         #i sad tu neki timer koji će pozvati ovu funkciju opet nakon 10 sek da se promijeni tekst i onda counter opet šiba dalje
-
+        #time.sleep(2)
+        #self.BottomFrame.after(3000, self.notification())
 
     def get_weather(self):
         try:
