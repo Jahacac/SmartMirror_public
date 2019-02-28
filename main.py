@@ -19,26 +19,26 @@ from face_detection import FaceDetection
 from gui import Gui
 
 class Printer(Thread): #sluzi kao demo da vidimo sta se dogada u pozadini (s printanjem)
-    #za dretve u ovom slucaju koristimo klase; napravimo klasu, njen konstruktor (koj nije obavezan)
-    def __init__(self, value):
-        Thread.__init__(self)
+
+    def __init__(self, value): #konstruktor u koji šaljemo početni flag za lice - Flase
+        Thread.__init__(self) #konstruktor od dretve
         self._value = value
         self.lock = Lock()
 
-    def run(self):
+    def run(self): #izvrsava se kada pokrenemo dretvu objekt.start()
         while True:
             with self.lock: #dvije stvari nemogu istovremeno vrtit taj blok koda
                 print("PRINTER BLOCK")
                 print("#" * 20)
                 print("1) ", self._value)
-                time.sleep(1)
+                time.sleep(1) #pauza 1 sekundu
                 print("2) ", self._value)
                 print("#" * 20)
-            time.sleep(2)
+            time.sleep(2) #pauza 2 sekunde
 
-    def face_update(self, has_face):
+    def face_update(self, has_face): #funkcija kojom dohvacamo flag za lice
         with self.lock:
-            self._value = has_face
+            self._value = has_face #postavljanje vrijednosti lica
 
 
 def gui_check_face(has_face):
@@ -53,7 +53,7 @@ def main():
         help="path to facial landmark predictor") #kad upisemo help u cl nam to ispise
     args = ap.parse_args()
 
-    p = Printer(value = False) #konstruktor za printer + salje se pocetna vrijednost flag-a za lice
+    p = Printer(value = False)
     p.start()
 
     gui = Gui(value = False) #konstruktor za gui + salje se pocetna vrijednost flag-a za lice
