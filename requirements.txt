@@ -1,1 +1,21 @@
-//github testtttt
+Django
+Pillow
+argparse
+beautifulsoup4
+bs4
+certifi
+chardet
+dlib
+feedparser
+idna
+image
+imutils
+numpy
+opencv-python
+pip
+pytz
+requests
+setuptools
+soupsieve
+urllib3
+wheel
