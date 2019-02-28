@@ -1,4 +1,5 @@
 Django
+CMake
 Pillow
 argparse
 beautifulsoup4
