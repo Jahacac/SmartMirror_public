@@ -10,7 +10,7 @@ feedparser==5.2.1
 idna==2.8
 image==1.5.27
 imutils==0.5.1
-numpy==1.15.2
+numpy==1.22.0
 opencv-python==3.4.3.18
 pip==18.1
 pytz==2018.6
